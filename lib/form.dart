@@ -70,7 +70,10 @@ class MyCustomFormState extends State<MyCustomForm> {
                 to = todoValidator.interpretTime(value);
               },
               validator: (value) {
-                return todoValidator.validateTime(value);
+                if (todoValidator.validateTime(value) != null) {
+                  return todoValidator.validateTime(value);
+                }
+                return todoValidator.validateTo(from, to);
               },
             ),
             TextFormField(

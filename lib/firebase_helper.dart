@@ -35,6 +35,8 @@ class TodoListItem {
 }
 
 class TodoListItemValidator {
+  final regex = "([01]?[0-9]|2[0-3]):[0-5][0-9]";
+
   DateFormat dateFormat = DateFormat("yyyy-MM-dd");
   interpretDate(String date) {
     if (date.toLowerCase() == "today") {
@@ -72,8 +74,39 @@ class TodoListItemValidator {
     if (from == null || from.isEmpty) {
       return "Needs Time";
     }
-    if (!from.contains(":") || from.contains(" ")) {
-      return "Invalid time format";
+    try {
+      if (from.contains("AM") || from.contains("PM")) {
+        from = from.replaceAll("PM", "");
+        from = from.replaceAll("AM", "");
+        if (!RegExp(regex).hasMatch(from)) {
+          return "Invalid time format";
+        }
+        List<String> timeList = from.split(":");
+
+        if (int.parse(timeList[0]) >= 12 || int.parse(timeList[1]) >= 60) {
+          return "Hours or Minutes to big";
+        }
+      } else {
+        List<String> timeList = from.split(":");
+        if (int.parse(timeList[0]) >= 24 || int.parse(timeList[1]) >= 60) {
+          return "Hours or Minutes to big";
+        }
+      }
+    } catch (e) {
+      return "Invalid time";
+    }
+
+    return null;
+  }
+
+  String? validateTo(String from, String to) {
+    from = interpretTime(from);
+    to = interpretTime(to);
+    List<String> listFrom = from.split(":");
+    List<String> listTo = to.split(":");
+    if (int.parse(listFrom[0]) >= int.parse(listTo[0]) &&
+        int.parse(listFrom[1]) >= int.parse(listTo[1])) {
+      return "To must be larger than from";
     }
 
     return null;

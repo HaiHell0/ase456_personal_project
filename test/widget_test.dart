@@ -1,30 +1,51 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
+import 'package:ase456_personal_project/firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:ase456_personal_project/main.dart';
+import 'package:ase456_personal_project/firebase_helper.dart';
+import 'package:ase456_personal_project/data_service.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
-
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  test('ToDoListItem Works', () {
+    TodoListItem testTodo =
+        TodoListItem('today', '10:40', '10:41', "JAVA", "TAG");
+    expect(testTodo.toMap(), {
+      'date': 'today',
+      'from': '10:40',
+      'to': '10:41',
+      'task': "JAVA",
+      'tag': "TAG"
+    });
   });
+  test('TodoListItemValidator works', () {
+    TodoListItemValidator testTodo = TodoListItemValidator();
+    expect(testTodo.validateDate("ToDaY"), null);
+    expect(testTodo.validateTime("10:40AM"), null);
+    expect(testTodo.validateTime("10:40PM"), null);
+    expect(testTodo.validateTo("10:40", "10:41"), null);
+    expect(
+        testTodo.validateTo("10:40", "10:39"), "To must be larger than from");
+    expect(testTodo.validateTime("ss:ss"), "Invalid time");
+    expect(testTodo.validateTime("100:100"), "Hours or Minutes to big");
+    expect(testTodo.validateTime(null), "Needs Time");
+    expect(testTodo.validateTime(""), "Needs Time");
+  });
+/*   test('Data_service works', () async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    DatabaseService testData = DatabaseService();
+    TodoListItem testTodo =
+        TodoListItem('today', '10:40', '10:41', "JAVA", "asdfasdf");
+    testData.addTodoListItem(testTodo);
+    List<TodoListItem> test1 =
+        await testData.retrieveTodoListItemsByField('tag', "asdfasdf");
+    expect(test1[0].tag, "asdfasdf");
+    testData.deleteTodoListItem(test1[0].id!);
+    List<TodoListItem> test2 =
+        await testData.retrieveTodoListItemsByField('tag', "asdfasdf");
+    expect(test2.length, 0);
+  }); */
 }
